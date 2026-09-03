@@ -90,6 +90,47 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  Future<void> _editTask(int index) async {
+    final controller = TextEditingController(text: _tasks[index]);
+    final editedTask = await showDialog<String>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Editar tarefa'),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            onSubmitted: (_) => Navigator.of(context).pop(controller.text),
+            decoration: const InputDecoration(
+              labelText: 'Tarefa',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(controller.text),
+              child: const Text('Salvar'),
+            ),
+          ],
+        );
+      },
+    );
+    controller.dispose();
+
+    final task = editedTask?.trim();
+    if (task == null || task.isEmpty) {
+      return;
+    }
+
+    setState(() {
+      _tasks[index] = task;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     //Método responsável por construir a interface do usuário da página inicial.
@@ -164,10 +205,20 @@ class _HomePageState extends State<HomePage> {
                               ],
                             ),
                             title: Text(_tasks[index]),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.delete),
-                              tooltip: 'Remover tarefa',
-                              onPressed: () => _removeTask(index),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.edit),
+                                  tooltip: 'Editar tarefa',
+                                  onPressed: () => _editTask(index),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.delete),
+                                  tooltip: 'Remover tarefa',
+                                  onPressed: () => _removeTask(index),
+                                ),
+                              ],
                             ),
                           ),
                         );
