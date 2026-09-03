@@ -106,6 +106,9 @@ class _HomePageState extends State<HomePage> {
                       itemBuilder: (context, index) {
                         return Card(
                           child: ListTile(
+                            leading: CircleAvatar(
+                              child: Text('${index + 1}'),
+                            ),
                             title: Text(_tasks[index]),
                             trailing: IconButton(
                               icon: const Icon(Icons.delete),
