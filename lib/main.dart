@@ -31,6 +31,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final TextEditingController _taskController = TextEditingController();
   final List<String> _tasks = [];
+  final Set<int> _selectedIndexes = {};
 
   @override
   void dispose() {
@@ -51,8 +52,41 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _removeTask(int index) {
+    final remainingSelectedIndexes = _selectedIndexes
+        .where((selectedIndex) => selectedIndex != index)
+        .map(
+          (selectedIndex) =>
+              selectedIndex > index ? selectedIndex - 1 : selectedIndex,
+        )
+        .toSet();
+
     setState(() {
       _tasks.removeAt(index);
+      _selectedIndexes
+        ..clear()
+        ..addAll(remainingSelectedIndexes);
+    });
+  }
+
+  void _deleteSelectedTasks() {
+    final indexes = _selectedIndexes.toList()
+      ..sort((first, second) => second.compareTo(first));
+
+    setState(() {
+      for (final index in indexes) {
+        _tasks.removeAt(index);
+      }
+      _selectedIndexes.clear();
+    });
+  }
+
+  void _toggleTaskSelection(int index, bool selected) {
+    setState(() {
+      if (selected) {
+        _selectedIndexes.add(index);
+      } else {
+        _selectedIndexes.remove(index);
+      }
     });
   }
 
@@ -62,7 +96,9 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Lista de Tarefas',
+          _selectedIndexes.isEmpty
+              ? 'Lista de Tarefas'
+              : '${_selectedIndexes.length} selecionada(s)',
           style: TextStyle(
             color: const Color.fromARGB(255, 0, 0, 0),
             fontSize: 24,
@@ -70,6 +106,14 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         centerTitle: true,
+        actions: [
+          if (_selectedIndexes.isNotEmpty)
+            IconButton(
+              icon: const Icon(Icons.delete),
+              tooltip: 'Excluir tarefas selecionadas',
+              onPressed: _deleteSelectedTasks,
+            ),
+        ],
       ),
 
       body: Padding(
@@ -106,8 +150,18 @@ class _HomePageState extends State<HomePage> {
                       itemBuilder: (context, index) {
                         return Card(
                           child: ListTile(
-                            leading: CircleAvatar(
-                              child: Text('${index + 1}'),
+                            leading: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Checkbox(
+                                  value: _selectedIndexes.contains(index),
+                                  onChanged: (selected) =>
+                                      _toggleTaskSelection(index, selected!),
+                                ),
+                                CircleAvatar(
+                                  child: Text('${index + 1}'),
+                                ),
+                              ],
                             ),
                             title: Text(_tasks[index]),
                             trailing: IconButton(
