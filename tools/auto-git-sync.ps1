@@ -7,13 +7,29 @@ Set-Location $projectPath
 function Sync-Repository {
     $status = & $gitPath status --porcelain
     if (-not $status) {
+        Write-Host "Nenhuma alteracao para sincronizar."
         return
     }
 
     & $gitPath add --all
+
     $message = "chore: auto-sync $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
     & $gitPath commit -m $message
-    & $gitPath push origin main
+
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host ""
+        Write-Host "Arquivo comitado em $(Get-Date -Format 'HH:mm:ss')"
+        Write-Host "Enviando para o GitHub..."
+        & $gitPath push origin main
+
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "Sincronizacao concluida com sucesso!"
+        } else {
+            Write-Host "Falha no push. Verifique sua autenticacao do GitHub."
+        }
+    } else {
+        Write-Host "Commit nao realizado."
+    }
 }
 
 $watcher = New-Object System.IO.FileSystemWatcher
@@ -37,7 +53,8 @@ $deletedSubscription = Register-ObjectEvent $watcher Deleted -Action $action
 $renamedSubscription = Register-ObjectEvent $watcher Renamed -Action $action
 
 Write-Host "Sincronizacao automatica ativa em $projectPath"
-Write-Host 'Pressione Ctrl+C para encerrar.'
+Write-Host "Aguardando alteracoes..."
+Write-Host "Quando houver arquivo salvo, aparecera: 'Arquivo comitado'"
 
 try {
     while ($true) {
