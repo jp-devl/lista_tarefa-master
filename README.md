@@ -1,60 +1,60 @@
 ﻿# Lista de Tarefas
 
-Aplicativo de lista de tarefas desenvolvido como trabalho acadÃªmico da **FASEC** para a disciplina **Desenvolvimento Mobile**.
+Aplicativo de lista de tarefas desenvolvido como trabalho academico da **FASEC** para a disciplina **Desenvolvimento Mobile**.
 
 ## Sobre o projeto
 
-Este projeto foi criado para colocar em prÃ¡tica os fundamentos do Flutter e do Dart no desenvolvimento de uma aplicaÃ§Ã£o mobile multiplataforma. A proposta Ã© construir uma experiÃªncia simples, funcional e preparada para receber novos recursos.
+Este projeto foi criado para colocar em pratica os fundamentos do Flutter e do Dart no desenvolvimento de uma aplicacao mobile multiplataforma. A proposta e construir uma experiencia simples, funcional e preparada para receber novos recursos.
 
 ## Por que estamos aprendendo Flutter?
 
-O Flutter permite criar aplicaÃ§Ãµes para diferentes plataformas a partir de uma Ãºnica base de cÃ³digo, usando widgets reutilizÃ¡veis e uma interface declarativa. Durante a disciplina, o framework ajuda a estudar conceitos importantes do desenvolvimento mobile, como:
+O Flutter permite criar aplicacoes para diferentes plataformas a partir de uma unica base de codigo, usando widgets reutilizaveis e uma interface declarativa. Durante a disciplina, o framework ajuda a estudar conceitos importantes do desenvolvimento mobile, como:
 
-- ConstruÃ§Ã£o de interfaces responsivas
+- Construcao de interfaces responsivas
 - Gerenciamento de estado
-- InteraÃ§Ã£o com o usuÃ¡rio
-- OrganizaÃ§Ã£o de projetos mobile
-- ExecuÃ§Ã£o para Android, iOS, Web e desktop
+- Interacao com o usuario
+- Organizacao de projetos mobile
+- Execucao para Android, iOS, Web e desktop
 
 ## Funcionalidades
 
-- Adicionar tarefas pelo botÃ£o ou pressionando `Enter`
+- Adicionar tarefas pelo botao ou pressionando `Enter`
 - Exibir as tarefas cadastradas em uma lista
 - Remover tarefas individualmente
-- Informar quando a lista estÃ¡ vazia
+- Informar quando a lista esta vazia
 
 ## Objetos interativos e efeitos especiais
 
-A interface foi pensada para evoluir com objetos interativos, como campos de entrada, botÃµes, cartÃµes e Ã­cones de aÃ§Ã£o. Entre os efeitos especiais que podem ser incorporados nas prÃ³ximas versÃµes estÃ£o:
+A interface foi pensada para evoluir com objetos interativos, como campos de entrada, botoes, cartoes e icones de acao. Entre os efeitos especiais que podem ser incorporados nas proximas versoes estao:
 
-- AnimaÃ§Ã£o ao adicionar e remover tarefas
-- TransiÃ§Ãµes suaves nos cartÃµes da lista
+- Animacao ao adicionar e remover tarefas
+- Transicoes suaves nos cartoes da lista
 - Feedback visual ao concluir uma tarefa
-- Tema visual personalizado para tornar a experiÃªncia mais agradÃ¡vel
+- Tema visual personalizado para tornar a experiencia mais agradavel
 
 <details>
-<summary>Ver fluxo principal da aplicaÃ§Ã£o</summary>
+<summary>Ver fluxo principal da aplicacao</summary>
 
 ```mermaid
 flowchart TD
-		A[UsuÃ¡rio abre o aplicativo] --> B[Digite uma tarefa]
-		B --> C{Tarefa vÃ¡lida?}
-		C -- NÃ£o --> B
+		A[Usuario abre o aplicativo] --> B[Digite uma tarefa]
+		B --> C{Tarefa valida?}
+		C -- Nao --> B
 		C -- Sim --> D[Clique em Adicionar ou pressione Enter]
 		D --> E[Tarefa aparece na lista]
-		E --> F[Clique no Ã­cone de lixeira]
-		F --> G[Tarefa Ã© removida]
+		E --> F[Clique no icone de lixeira]
+		F --> G[Tarefa e removida]
 ```
 
 </details>
 
 ## Como executar
 
-### PrÃ©-requisitos
+### Pre-requisitos
 
 - Flutter SDK
-- Dart SDK, incluÃ­do no Flutter
-- Google Chrome, Android Studio ou outro dispositivo compatÃ­vel
+- Dart SDK, incluido no Flutter
+- Google Chrome, Android Studio ou outro dispositivo compativel
 
 ### Passos
 
@@ -69,8 +69,8 @@ flutter run -d chrome
 
 ```text
 lib/
-	main.dart       # Interface e lÃ³gica principal da lista de tarefas
-pubspec.yaml      # ConfiguraÃ§Ãµes e dependÃªncias do projeto
+	main.dart       # Interface e logica principal da lista de tarefas
+pubspec.yaml      # Configuracoes e dependencias do projeto
 ```
 
 ## Tecnologias
@@ -81,11 +81,11 @@ pubspec.yaml      # ConfiguraÃ§Ãµes e dependÃªncias do projeto
 
 ## Agradecimentos
 
-AgradeÃ§o Ã  **FASEC** pela oportunidade de aprendizado e ao professor da disciplina **Desenvolvimento Mobile** pelas orientaÃ§Ãµes durante a construÃ§Ã£o deste projeto.
+Agradeco a **FASEC** pela oportunidade de aprendizado e ao professor da disciplina **Desenvolvimento Mobile** pelas orientacoes durante a construcao deste projeto.
 
-TambÃ©m agradeÃ§o Ã  comunidade Flutter e Dart, Ã  documentaÃ§Ã£o oficial e a todos que compartilham conhecimento sobre desenvolvimento de aplicaÃ§Ãµes multiplataforma.
+Tambem agradeco a comunidade Flutter e Dart, a documentacao oficial e a todos que compartilham conhecimento sobre desenvolvimento de aplicacoes multiplataforma.
 
 ---
 
-Projeto acadÃªmico desenvolvido por **JoÃ£o Pedro Moreira Martins de Sousa**.
+Projeto academico desenvolvido por **Joao Pedro Moreira Martins de Sousa**.
 
