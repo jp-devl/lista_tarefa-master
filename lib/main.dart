@@ -11,7 +11,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        scaffoldBackgroundColor: const Color.fromARGB(255, 28, 191, 197),
+        scaffoldBackgroundColor: const Color.fromARGB(255, 197, 104, 28),
       ),
       title: 'Lista de Tarefas',
       debugShowCheckedModeBanner: false,
