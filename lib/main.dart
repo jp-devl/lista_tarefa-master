@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math' as math;
 
 void main() {
   runApp(const MainApp());
@@ -10,13 +11,36 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(
-        scaffoldBackgroundColor: const Color.fromARGB(255, 180, 105, 44),
-      ),
       title: 'Lista de Tarefas',
       debugShowCheckedModeBanner: false,
-
+      theme: ThemeData(
+        scaffoldBackgroundColor: const Color(0xFFF5F5F5),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
+        useMaterial3: true,
+      ),
       home: const HomePage(),
+    );
+  }
+}
+
+enum TaskFilter { all, active, completed }
+
+class TaskItem {
+  TaskItem({
+    required this.id,
+    required this.text,
+    this.completed = false,
+  });
+
+  final String id;
+  final String text;
+  final bool completed;
+
+  TaskItem copyWith({String? text, bool? completed}) {
+    return TaskItem(
+      id: id,
+      text: text ?? this.text,
+      completed: completed ?? this.completed,
     );
   }
 }
@@ -30,8 +54,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final TextEditingController _taskController = TextEditingController();
-  final List<String> _tasks = [];
-  final Set<int> _selectedIndexes = {};
+  final List<TaskItem> _tasks = [];
+  final Set<String> _selectedTaskIds = {};
+  TaskFilter _currentFilter = TaskFilter.all;
 
   @override
   void dispose() {
@@ -39,59 +64,76 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
+  List<TaskItem> get _filteredTasks {
+    switch (_currentFilter) {
+      case TaskFilter.active:
+        return _tasks.where((task) => !task.completed).toList();
+      case TaskFilter.completed:
+        return _tasks.where((task) => task.completed).toList();
+      case TaskFilter.all:
+      default:
+        return _tasks;
+    }
+  }
+
   void _addTask() {
-    final task = _taskController.text.trim();
-    if (task.isEmpty) {
+    final taskText = _taskController.text.trim();
+    if (taskText.isEmpty) {
       return;
     }
 
     setState(() {
-      _tasks.add(task);
+      _tasks.add(
+        TaskItem(
+          id: DateTime.now().microsecondsSinceEpoch.toString(),
+          text: taskText,
+        ),
+      );
       _taskController.clear();
     });
   }
 
-  void _removeTask(int index) {
-    final remainingSelectedIndexes = _selectedIndexes
-        .where((selectedIndex) => selectedIndex != index)
-        .map(
-          (selectedIndex) =>
-              selectedIndex > index ? selectedIndex - 1 : selectedIndex,
-        )
-        .toSet();
-
+  void _removeTask(String taskId) {
     setState(() {
-      _tasks.removeAt(index);
-      _selectedIndexes
-        ..clear()
-        ..addAll(remainingSelectedIndexes);
+      _tasks.removeWhere((task) => task.id == taskId);
+      _selectedTaskIds.remove(taskId);
     });
   }
 
   void _deleteSelectedTasks() {
-    final indexes = _selectedIndexes.toList()
-      ..sort((first, second) => second.compareTo(first));
-
     setState(() {
-      for (final index in indexes) {
-        _tasks.removeAt(index);
+      for (final taskId in _selectedTaskIds) {
+        _tasks.removeWhere((task) => task.id == taskId);
       }
-      _selectedIndexes.clear();
+      _selectedTaskIds.clear();
     });
   }
 
-  void _toggleTaskSelection(int index, bool selected) {
+  void _toggleTaskSelection(String taskId, bool selected) {
     setState(() {
       if (selected) {
-        _selectedIndexes.add(index);
+        _selectedTaskIds.add(taskId);
       } else {
-        _selectedIndexes.remove(index);
+        _selectedTaskIds.remove(taskId);
       }
     });
   }
 
-  Future<void> _editTask(int index) async {
-    final controller = TextEditingController(text: _tasks[index]);
+  void _toggleTaskCompletion(TaskItem task) {
+    setState(() {
+      final index = _tasks.indexWhere((item) => item.id == task.id);
+      if (index == -1) {
+        return;
+      }
+
+      _tasks[index] = _tasks[index].copyWith(
+        completed: !task.completed,
+      );
+    });
+  }
+
+  Future<void> _editTask(TaskItem task) async {
+    final controller = TextEditingController(text: task.text);
     final editedTask = await showDialog<String>(
       context: context,
       builder: (context) {
@@ -119,44 +161,60 @@ class _HomePageState extends State<HomePage> {
         );
       },
     );
+
     controller.dispose();
 
-    final task = editedTask?.trim();
-    if (task == null || task.isEmpty) {
+    final newText = editedTask?.trim();
+    if (newText == null || newText.isEmpty) {
       return;
     }
 
     setState(() {
-      _tasks[index] = task;
+      final index = _tasks.indexWhere((item) => item.id == task.id);
+      if (index != -1) {
+        _tasks[index] = _tasks[index].copyWith(text: newText);
+      }
     });
+  }
+
+  String _emptyMessage() {
+    switch (_currentFilter) {
+      case TaskFilter.active:
+        return 'Nenhuma tarefa ativa';
+      case TaskFilter.completed:
+        return 'Nenhuma tarefa concluída';
+      case TaskFilter.all:
+      default:
+        return 'Nenhuma tarefa adicionada';
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    //Método responsável por construir a interface do usuário da página inicial.
+    final filteredTasks = _filteredTasks;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          _selectedIndexes.isEmpty
+          _selectedTaskIds.isEmpty
               ? 'Lista de Tarefas'
-              : '${_selectedIndexes.length} selecionada(s)',
-          style: TextStyle(
-            color: const Color.fromARGB(255, 0, 0, 0),
+              : '${_selectedTaskIds.length} selecionada(s)',
+          style: const TextStyle(
+            color: Colors.black,
             fontSize: 24,
             fontWeight: FontWeight.bold,
           ),
         ),
         centerTitle: true,
         actions: [
-          if (_selectedIndexes.isNotEmpty)
+          if (_selectedTaskIds.isNotEmpty)
             IconButton(
+              onPressed: _deleteSelectedTasks,
               icon: const Icon(Icons.delete),
               tooltip: 'Excluir tarefas selecionadas',
-              onPressed: _deleteSelectedTasks,
             ),
         ],
       ),
-
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -182,41 +240,66 @@ class _HomePageState extends State<HomePage> {
                 ),
               ],
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
+            Row(
+              children: [
+                _buildFilterChip('Todas', TaskFilter.all),
+                const SizedBox(width: 8),
+                _buildFilterChip('Ativas', TaskFilter.active),
+                const SizedBox(width: 8),
+                _buildFilterChip('Concluídas', TaskFilter.completed),
+              ],
+            ),
+            const SizedBox(height: 16.0),
             Expanded(
-              child: _tasks.isEmpty
-                  ? const Center(child: Text('Nenhuma tarefa adicionada'))
+              child: filteredTasks.isEmpty
+                  ? Center(child: Text(_emptyMessage()))
                   : ListView.builder(
-                      itemCount: _tasks.length,
+                      itemCount: filteredTasks.length,
                       itemBuilder: (context, index) {
+                        final task = filteredTasks[index];
+                        final isSelected = _selectedTaskIds.contains(task.id);
+
                         return Card(
+                          margin: const EdgeInsets.only(bottom: 10),
                           child: ListTile(
-                            leading: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Checkbox(
-                                  value: _selectedIndexes.contains(index),
-                                  onChanged: (selected) =>
-                                      _toggleTaskSelection(index, selected!),
-                                ),
-                                CircleAvatar(
-                                  child: Text('${index + 1}'),
-                                ),
-                              ],
+                            leading: Checkbox(
+                              value: isSelected,
+                              onChanged: (selected) =>
+                                  _toggleTaskSelection(task.id, selected ?? false),
                             ),
-                            title: Text(_tasks[index]),
+                            title: Text(
+                              task.text,
+                              style: TextStyle(
+                                decoration: task.completed
+                                    ? TextDecoration.lineThrough
+                                    : null,
+                                color: task.completed ? Colors.grey : Colors.black,
+                              ),
+                            ),
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 IconButton(
-                                  icon: const Icon(Icons.edit),
-                                  tooltip: 'Editar tarefa',
-                                  onPressed: () => _editTask(index),
+                                  onPressed: () => _toggleTaskCompletion(task),
+                                  icon: Icon(
+                                    task.completed
+                                        ? Icons.check_box
+                                        : Icons.check_box_outline_blank,
+                                  ),
+                                  tooltip: task.completed
+                                      ? 'Marcar como ativa'
+                                      : 'Marcar como concluída',
                                 ),
                                 IconButton(
+                                  onPressed: () => _editTask(task),
+                                  icon: const Icon(Icons.edit),
+                                  tooltip: 'Editar tarefa',
+                                ),
+                                IconButton(
+                                  onPressed: () => _removeTask(task.id),
                                   icon: const Icon(Icons.delete),
                                   tooltip: 'Remover tarefa',
-                                  onPressed: () => _removeTask(index),
                                 ),
                               ],
                             ),
@@ -227,6 +310,22 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildFilterChip(String label, TaskFilter filter) {
+    final isSelected = _currentFilter == filter;
+
+    return Expanded(
+      child: ChoiceChip(
+        label: Text(label),
+        selected: isSelected,
+        onSelected: (_) {
+          setState(() {
+            _currentFilter = filter;
+          });
+        },
       ),
     );
   }
