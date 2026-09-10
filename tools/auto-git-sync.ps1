@@ -30,7 +30,7 @@ function Sync-Repository {
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Sincronizacao concluida com sucesso!"
     } else {
-        Write-Host "Falha no push. Verifique autenticacao do GitHub ou as credenciais do repositorio."
+        Write-Host "Falha no push, Verifique sua autenticacao do GitHub"
     }
 }
 
