@@ -7,7 +7,7 @@ Set-Location $projectPath
 function Sync-Repository {
     $status = & $gitPath status --porcelain
     if (-not $status) {
-        Write-Host "Nenhuma alteracao para sincronizar."
+        Write-Host "Nenhuma alteracao para enviar ao GitHub."
         return
     }
 
@@ -16,19 +16,21 @@ function Sync-Repository {
     $message = "chore: auto-sync $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
     & $gitPath commit -m $message
 
-    if ($LASTEXITCODE -eq 0) {
-        Write-Host ""
-        Write-Host "Arquivo comitado em $(Get-Date -Format 'HH:mm:ss')"
-        Write-Host "Enviando para o GitHub..."
-        & $gitPath push origin main
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Commit nao realizado. Pode ter sido uma alteracao vazia ou algum problema do Git."
+        return
+    }
 
-        if ($LASTEXITCODE -eq 0) {
-            Write-Host "Sincronizacao concluida com sucesso!"
-        } else {
-            Write-Host "Falha no push. Verifique sua autenticacao do GitHub."
-        }
+    Write-Host ""
+    Write-Host "Arquivo comitado em $(Get-Date -Format 'HH:mm:ss')"
+    Write-Host "Enviando para o GitHub..."
+
+    & $gitPath push origin main
+
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "Sincronizacao concluida com sucesso!"
     } else {
-        Write-Host "Commit nao realizado."
+        Write-Host "Falha no push. Verifique autenticacao do GitHub ou as credenciais do repositorio."
     }
 }
 
