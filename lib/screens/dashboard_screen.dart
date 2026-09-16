@@ -245,3 +245,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _botaoIncremento(String texto, VoidCallback aoClicar, Color cor) {
     return ElevatedButton(
       onPressed: aoClicar,
+s      style: ElevatedButton.styleFrom(
+        backgroundColor: cor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      ),
+      child: Text(
+        texto,
+        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+}
