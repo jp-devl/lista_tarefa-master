@@ -1,5 +1,4 @@
-$projectPath = "C:\Users\João Pedro\Documents\lista_tarefa-master\lista_tarefa-master\lib\screens"
-$gitPath = 'C:\Program Files\Git\cmd\git.exe'
+$projectPath = "C:\repos\lista_tarefa_master\lib\screens"$gitPath = 'C:\Program Files\Git\cmd\git.exe'
 $debounceSeconds = 3
 
 Set-Location $projectPath
