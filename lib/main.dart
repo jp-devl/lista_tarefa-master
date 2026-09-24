@@ -96,11 +96,21 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void _addTask() {
-    final taskText = _taskController.text.trim();
-    if (taskText.isEmpty) {
+  int? indiceEdicao;
+
+  Future<void> adicionarTarefa() async {
+    if (tarefaController.text.isEmpty) {
+
       return;
     }
+
+    await DatabaseHelper.instance.inserirTarefa(tarefaController.text);
+    tarefaController.clear();
+
+    carregarTarefas();
+
+
+  }
 
     setState(() {
       _tasks.add(
@@ -255,7 +265,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 const SizedBox(width: 8.0),
                 ElevatedButton(
-                  onPressed: _addTask,
+                  onPressed: adicionarTarefa(),
                   child: const Text('Adicionar'),
                 ),
               ],
