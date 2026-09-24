@@ -1,7 +1,18 @@
+import 'dart:io';
+import database/database_helper.dart';
+
+
+
 import 'package:flutter/material.dart';
 
+
+
 void main() {
-  runApp(const MainApp());
+  if (Platform.isWindows) {
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+  }
+
 }
 
 class MainApp extends StatelessWidget {
