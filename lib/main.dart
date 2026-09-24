@@ -63,16 +63,25 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
+
+
+
 class _HomePageState extends State<HomePage> {
   final TextEditingController _taskController = TextEditingController();
-  final List<TaskItem> _tasks = [];
-  final Set<String> _selectedTaskIds = {};
-  TaskFilter _currentFilter = TaskFilter.all;
+
+  List<Map<String, dynamic>> tarefas = [];
 
   @override
   void dispose() {
-    _taskController.dispose();
-    super.dispose();
+    super.initState();
+    carregarTarefas();
+  }
+
+  Future<void> carregarTarefas() async {
+    final dados = await DatabaseHelper.instance.listartarefas();
+    setState(() {
+      tarefas = dados;
+    });
   }
 
   List<TaskItem> get _filteredTasks {
